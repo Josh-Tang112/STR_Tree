@@ -161,9 +161,25 @@ struct STRTREE {
         print_bb(0, this->root);
     }
 
-    std::vector<struct Branch<T> *> retrieve_all_data(){
-        std::vector<struct Branch<T> *> res;
-        ;
+    // retrive leaves instead of data in case T is not an assignable type
+    std::vector<struct Branch<T> *>* retrieve_all_leaves(){
+        std::vector<struct Branch<T> *> *res = new std::vector<struct Branch<T> *>;
+        std::vector<struct Node<T> *> stack;
+        stack.push_back(this->root);
+        while(!stack.empty()){
+            struct Node<T> *n = stack.back();
+            stack.pop_back();
+            if(!is_leaf(n)){
+                for(int i = n->count - 1; i >= 0; i --){
+                    stack.push_back(n->children[i]->children);
+                }
+            }
+            else{
+                for(int i = 0; i < n->count; i++)
+                    res->push_back(n->children[i]);
+            }
+        }
+        return res;
     }
 
     bool is_leaf(struct Node<T> *n){
