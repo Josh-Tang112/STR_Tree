@@ -1,6 +1,6 @@
 CC = g++ 
-LDLIBS = -lsfml-graphics -lsfml-window -lsfml-system -lm
-CFLAGS = -Iphysics -Ihelper -ggdb3
+LDLIBS = -lm
+CFLAGS = -Itree -ggdb3
 
 all: debug
 

@@ -4,6 +4,7 @@
 
 #pragma once
 #include <cstdlib>
+#include <cstdio>
 #include <cmath>
 #include <cassert>
 #include <bits/stdc++.h>
@@ -64,8 +65,8 @@ struct Branch {
 };
 
 template<typename T, int i>
-bool comp(struct Branch<T> a, struct Branch<T> b){
-    return (a.rect[0][i] + a.rect[1][i]) / 2 < (b.rect[0][i] + b.rect[1][i]) / 2;
+bool comp(struct Branch<T> *a, struct Branch<T> *b){
+    return (a->rect[0][i] + a->rect[1][i]) / 2 < (b->rect[0][i] + b->rect[1][i]) / 2;
 }
 
 template <typename T, int N>
@@ -83,6 +84,7 @@ struct STRTREE {
         }
 
         int S = std::ceil(std::sqrt(num / ((float)N))); // ceil(sqrt(num_rectangles / num_data_in_leaf)) vertical slices
+
         std::stable_sort(bbs, bbs + num, comp<T,0>); //sort by x
         for(int i = 1; i < S; i++){
             int upper = (S * N * i < num)? S * N * i : num, lower = S * N * (i - 1);
@@ -135,6 +137,22 @@ struct STRTREE {
 
         std::free(nodes_in_this_level);
         std::free(bbs);
+    }
+
+    void print_bb(int c, struct Node<T> *nptr){
+        for(int i = 0; i < c; i++){
+            printf("  ");
+        }
+        for(int i = 0; i < nptr->count; i++){
+            struct Branch<T> *tmp = nptr->children[i];
+            printf("%d, %d | %d, %d\n",tmp->rect[0][0], tmp->rect[0][1], tmp->rect[1][0], tmp->rect[1][1]);
+            if(nptr->children[i]->children)
+                print_bb(c + 1, nptr->children[i]->children);
+        }
+    }
+
+    void print_tree(){
+        print_bb(0, this->root);
     }
 
     bool is_leaf(struct Node<T> *n){
