@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cmath>
 #include <cassert>
+#include <vector>
 #include <bits/stdc++.h>
 
 template <typename T>
@@ -83,16 +84,20 @@ struct STRTREE {
             bbs[i] = tmp;
         }
 
-        int S = std::ceil(std::sqrt(num / ((float)N))); // ceil(sqrt(num_rectangles / num_data_in_leaf)) vertical slices
+        int S = std::ceil(std::sqrt(num / ((float)N))); // ceil(sqrt(num_rectangles / num_data_in_leaf)) vertical slices, >= 2 as long as num > N
+        int nwindow = std::ceil(num / ((float) S * N)); // number of times the window has to shift
 
         std::stable_sort(bbs, bbs + num, comp<T,0>); //sort by x
-        for(int i = 1; i < S; i++){
+        for(int i = 1; i <=  nwindow; i++){
+            // math tells us each tile has S * N elements, but ceil will mess it up
+            // so we sort using windows of size S * N
             int upper = (S * N * i < num)? S * N * i : num, lower = S * N * (i - 1);
             std::stable_sort(bbs + lower, bbs + upper, comp<T,1>); // sort by y for each tile
         }
 
-        int num_nodes_in_this_level = std::ceil(num / N), current_num_node = 0, num_branch, branch_count = 0, num_in_leaf = 0;
+        int num_nodes_in_this_level = std::ceil(num / (float)N), current_num_node = 0, num_branch, branch_count = 0, num_in_leaf = 0;
         struct Node<T> **nodes_in_this_level = (struct Node<T>**)std::malloc(num_nodes_in_this_level * sizeof(struct Node<T>*));
+
         // constructing the tree
         while(num_nodes_in_this_level > 1){
             // constructing each level
@@ -111,19 +116,20 @@ struct STRTREE {
             for(int i = 0; i < current_num_node; i++){
                 struct Branch<T> *tmp = new struct Branch<T>();
                 tmp->children = nodes_in_this_level[i];
-                (*tmp).set_rect();
+                tmp->set_rect();
                 bbs[i] = tmp;
             }
 
             num = num_nodes_in_this_level;
             S = std::ceil(std::sqrt(num / ((float)N))); // repeat the process
+            nwindow = std::ceil(num / ((float) S * N));
             std::stable_sort(bbs, bbs + num, comp<T,0>); // sort by x
-            for(int i = 1; i < S; i++){
+            for(int i = 1; i <= nwindow; i++){
                 int upper = (S * N * i < num)? S * N * i : num, lower = S * N * (i - 1);
                 std::stable_sort(bbs + lower, bbs + upper, comp<T,1>); // sort by y for each tile
             }
             // set appropriate var
-            num_nodes_in_this_level = std::ceil(num / N);
+            num_nodes_in_this_level = std::ceil(num / (float)N);
             current_num_node = 0;
             branch_count = 0;
         }
@@ -140,11 +146,11 @@ struct STRTREE {
     }
 
     void print_bb(int c, struct Node<T> *nptr){
-        for(int i = 0; i < c; i++){
-            printf("  ");
-        }
         for(int i = 0; i < nptr->count; i++){
             struct Branch<T> *tmp = nptr->children[i];
+            for(int i = 0; i < c; i++){
+                printf("  ");
+            }
             printf("%d, %d | %d, %d\n",tmp->rect[0][0], tmp->rect[0][1], tmp->rect[1][0], tmp->rect[1][1]);
             if(nptr->children[i]->children)
                 print_bb(c + 1, nptr->children[i]->children);
@@ -153,6 +159,11 @@ struct STRTREE {
 
     void print_tree(){
         print_bb(0, this->root);
+    }
+
+    std::vector<struct Branch<T> *> retrieve_all_data(){
+        std::vector<struct Branch<T> *> res;
+        ;
     }
 
     bool is_leaf(struct Node<T> *n){

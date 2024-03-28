@@ -24,9 +24,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    // printf("bounding boxes\n");
     // for(int i = 0; i < 5; i++){
     //     printf("%d, %d | %d, %d\n",bbs[i][0][0], bbs[i][0][1], bbs[i][1][0], bbs[i][1][1]);
     // }
+    // printf("--------------------\n");
 
     struct STRTREE<int,2> tree((int***)bbs, data, 5);
     tree.print_tree();
