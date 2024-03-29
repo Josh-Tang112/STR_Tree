@@ -182,6 +182,29 @@ struct STRTREE {
         return res;
     }
 
+    bool intersect(int bb1[2][2], int bb2[2][2]) {
+        return bb1[0][0] < bb2[1][0] && bb1[1][0] > bb2[0][0] && bb1[0][1] < bb2[1][1] && bb1[1][1] > bb2[0][1];
+    }
+
+    std::vector<struct Branch<T> *>* query(int q[2][2]){
+        std::vector<struct Branch<T> *> *res = new std::vector<struct Branch<T> *>;
+        std::vector<struct Node<T> *> stack;
+        stack.push_back(this->root);
+        while(!stack.empty()){
+            struct Node<T> *n = stack.back();
+            stack.pop_back();
+            for(int i = 0; i < n->count; i++){
+                if(intersect(q,n->children[i]->rect)){
+                    if(is_leaf(n))
+                        res->push_back(n->children[i]);
+                    else
+                        stack.push_back(n->children[i]->children);
+                }
+            }
+        }
+        return res;
+    }
+
     bool is_leaf(struct Node<T> *n){
         return n->children[0]->children == NULL;
     }
@@ -204,7 +227,3 @@ struct STRTREE {
         delete this->root;
     }
 };
-
-bool intersect(int bb1[2][2], int bb2[2][2]) {
-    return bb1[0][0] < bb2[1][0] && bb1[1][0] > bb2[0][0] && bb1[0][1] < bb2[1][1] && bb1[1][1] > bb2[0][1];
-}

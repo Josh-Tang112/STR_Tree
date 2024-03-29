@@ -31,11 +31,14 @@ int main(int argc, char *argv[])
     // printf("--------------------\n");
 
     struct STRTREE<int,2> tree((int***)bbs, data, 5);
-    std::vector<struct Branch<int> *> *res = tree.retrieve_all_leaves();
     tree.print_tree();
-    for(auto ptr : *res){
-        printf("%d\n",ptr->data);
+
+    int q[2][2] = {{20,30},{60,40}};
+    std::vector<struct Branch<int> *> *res = tree.query(q);
+    for(auto b : *res){
+        printf("%d\n",b->data);
     }
+
     delete res;
     tree.destroy();
 
