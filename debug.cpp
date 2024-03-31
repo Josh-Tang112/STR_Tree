@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     tree.print_tree();
 
     int q[2][2] = {{20,30},{60,40}};
-    std::vector<struct Branch<int> *> *res = tree.query(q);
+    std::vector<struct Branch<int> *> *res = tree.retrieve_all_leaves();
     for(auto b : *res){
         printf("%d\n",b->data);
     }

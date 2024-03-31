@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cmath>
 #include <cassert>
+#include <cstring>
+
 #include <vector>
 #include <bits/stdc++.h>
 
@@ -77,9 +79,12 @@ struct STRTREE {
     // rect is an array of bounding boxes
     STRTREE(int ***rect, T *data, size_t num){
         struct Branch<T> **bbs = (struct Branch<T> **)std::malloc(num * sizeof(struct Branch<T>*));
+        void *byte_offset = (void*)(&((struct Branch<T> *)NULL)->data);
         for(int i = 0; i < num; i++){
             struct Branch<T> *tmp = new struct Branch<T>(((int (*)[2][2])rect)[i]);
-            tmp->data = data[i];
+            char *for_cpy = (char*)tmp;
+            for_cpy += (unsigned long)byte_offset;
+            std::memcpy(for_cpy, data + i, sizeof(T));
             tmp->children = NULL;
             bbs[i] = tmp;
         }
