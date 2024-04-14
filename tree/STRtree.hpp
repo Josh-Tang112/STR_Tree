@@ -32,18 +32,18 @@ struct Node {
 
 template <typename T>
 struct Branch {
-    int rect[2][2]; // [0] - lower left point, [1] - upper right point
+    float rect[2][2]; // [0] - lower left point, [1] - upper right point
     struct Node<T> *children; // a ptr to an internal node, NULL when leaf
     T data;
 
     Branch(){}
 
-    Branch(int rect[2][2]){
-        std::memcpy(this->rect,rect,4 * sizeof(int));
+    Branch(float rect[2][2]){
+        std::memcpy(this->rect,rect,4 * sizeof(float));
     }
 
     Branch<T>(Branch<T> &b){
-        std::memcpy(this->rect,b.rect,4 * sizeof(int));
+        std::memcpy(this->rect,b.rect,4 * sizeof(float));
         this->data = b.data;
         this->children = b.children;
     }
@@ -81,11 +81,11 @@ struct STRTREE {
     }
 
     // rect is an array of bounding boxes
-    STRTREE(int ***rect, T *data, size_t num){
+    STRTREE(float ***rect, T *data, size_t num){
         struct Branch<T> **bbs = (struct Branch<T> **)std::malloc(num * sizeof(struct Branch<T>*));
         void *byte_offset = (void*)(&((struct Branch<T> *)NULL)->data);
         for(int i = 0; i < num; i++){
-            struct Branch<T> *tmp = new struct Branch<T>(((int (*)[2][2])rect)[i]);
+            struct Branch<T> *tmp = new struct Branch<T>(((float (*)[2][2])rect)[i]);
             char *for_cpy = (char*)tmp;
             for_cpy += (unsigned long)byte_offset;
             std::memcpy(for_cpy, data + i, sizeof(T));
@@ -160,7 +160,7 @@ struct STRTREE {
             for(int i = 0; i < c; i++){
                 printf("  ");
             }
-            printf("%d, %d | %d, %d\n",tmp->rect[0][0], tmp->rect[0][1], tmp->rect[1][0], tmp->rect[1][1]);
+            printf("%.4f, %.4f | %.4f, %.4f\n",tmp->rect[0][0], tmp->rect[0][1], tmp->rect[1][0], tmp->rect[1][1]);
             if(nptr->children[i]->children)
                 print_bb(c + 1, nptr->children[i]->children);
         }
